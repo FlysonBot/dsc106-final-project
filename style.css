@@ -1,0 +1,266 @@
+/* ---------- Colors and fonts ---------- */
+:root {
+  --cold: #2b6cb0;
+  --hot: #c8433a;
+  --ink: #1c2128;
+  --muted: #5d6673;
+  --paper: #fbfaf7;
+  --card: #ffffff;
+  --line: #e4e1da;
+  --hero-bg: #141a24;
+
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-width: 680px;
+  --figure-width: 1080px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--sans);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.6rem;
+  margin: 0 0 0.6em;
+}
+
+h3 {
+  font-size: 1.1rem;
+  margin: 1.8em 0 0.4em;
+}
+
+a {
+  color: var(--cold);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background: var(--hero-bg);
+  color: #f3f1ec;
+}
+
+.hero-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 6rem 1.5rem 4rem;
+}
+
+.kicker {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9fb4cf;
+  margin: 0 0 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  margin: 0 0 1.2rem;
+}
+
+.dek {
+  font-size: 1.3rem;
+  color: #c9cdd4;
+  margin: 0 0 2rem;
+}
+
+.byline {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: #9aa3ae;
+  margin: 0;
+}
+
+.byline span {
+  color: #f3f1ec;
+  font-weight: 500;
+}
+
+/* Cold-to-hot strip under the hero */
+.temp-bar {
+  height: 8px;
+  background: linear-gradient(90deg, var(--cold), #8fb3d9 30%, #f1e3c8 50%, #e9967a 70%, var(--hot));
+}
+
+/* ---------- Layout ---------- */
+main {
+  padding: 4rem 1.5rem 0;
+}
+
+section {
+  margin: 0 auto 4.5rem;
+}
+
+.prose {
+  max-width: var(--text-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lede {
+  font-size: 1.35rem;
+  line-height: 1.6;
+}
+
+.lede::first-letter {
+  float: left;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 3.6em;
+  line-height: 0.85;
+  padding: 0.08em 0.1em 0 0;
+  color: var(--hot);
+}
+
+/* ---------- Figure card ---------- */
+.figure {
+  max-width: var(--figure-width);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.figure-label {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hot);
+  margin: 0 0 0.3rem;
+}
+
+.vis {
+  width: 100%;
+  min-height: 460px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+.caption {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 1rem 0 0;
+}
+
+/* ---------- Takeaway callout ---------- */
+.callout {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.5rem 1.75rem 1.5rem 2rem;
+  overflow: hidden;
+}
+
+.callout::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, var(--hot), var(--cold));
+}
+
+.callout-label {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+  font-size: 1.25rem;
+}
+
+/* ---------- Video ---------- */
+.video-frame {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  display: grid;
+  place-items: center;
+  background: #e9e6df;
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.video-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 10px;
+}
+
+/* ---------- Prototype writeup ---------- */
+.notes {
+  background: #f2f0eb;
+  border-top: 1px solid var(--line);
+  margin: 0 -1.5rem;
+  padding: 3.5rem 1.5rem;
+  font-size: 1.05rem;
+}
+
+.notes h2 {
+  font-size: 1.3rem;
+}
+
+/* ---------- Footer ---------- */
+footer {
+  background: var(--hero-bg);
+  color: #9aa3ae;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  padding: 2.5rem 1.5rem;
+}
+
+footer strong {
+  color: #f3f1ec;
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 640px) {
+  body {
+    font-size: 1.05rem;
+  }
+
+  .hero-inner {
+    padding: 4rem 1.25rem 3rem;
+  }
+
+  .figure {
+    padding: 1.25rem;
+    border-radius: 8px;
+  }
+}
