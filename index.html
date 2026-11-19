@@ -53,6 +53,17 @@
             disabled
           /><span>2014</span>
         </div>
+        <fieldset class="view-toggle">
+          <legend>Color states by</legend>
+          <label
+            ><input type="radio" name="view" value="gap" checked disabled />
+            Annual gap</label
+          >
+          <label
+            ><input type="radio" name="view" value="change" disabled />
+            Change since 1850–1879</label
+          >
+        </fieldset>
         <svg
           id="map"
           viewBox="0 0 960 600"
@@ -60,7 +71,7 @@
           aria-label="Map showing the annual temperature gap in each U.S. state"
         ></svg>
         <div id="legend" aria-label="Color legend"></div>
-        <p class="note">
+        <p class="note" id="map-note">
           The color scale stays fixed across all years. Alaska and Hawaii appear
           as insets. Darker color means a larger gap, not faster warming.
         </p>
@@ -78,6 +89,7 @@
           <div>Hottest month<strong id="hot">—</strong></div>
           <div>Coldest month<strong id="cold">—</strong></div>
           <div>Annual gap<strong id="gap">—</strong></div>
+          <div>Change since 1850–1879<strong id="change">—</strong></div>
         </div>
         <p id="detail-note"></p>
         <svg
