@@ -180,6 +180,110 @@ svg {
   color: #1c343d;
 }
 
+/* ---------- Section 03: then and now ---------- */
+.toggle {
+  display: flex;
+}
+
+.toggle button {
+  min-width: 0;
+  border-radius: 0;
+  margin-left: -1px;
+  background: white;
+  color: #1c343d;
+}
+
+.toggle button:first-child {
+  border-radius: 6px 0 0 6px;
+  margin-left: 0;
+}
+
+.toggle button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.toggle button[aria-pressed='true'] {
+  background: #236a66;
+  color: white;
+}
+
+.summary {
+  font-weight: 650;
+}
+
+.change-grid path {
+  display: none;
+}
+
+.change-grid line {
+  stroke: #e3e9e5;
+}
+
+.change-grid text {
+  font-size: 11px;
+  fill: #53666c;
+}
+
+.change-row {
+  cursor: pointer;
+}
+
+.change-hit {
+  fill: transparent;
+}
+
+.change-row:hover .change-hit,
+.change-row.selected .change-hit {
+  fill: #eef3f1;
+}
+
+.change-name {
+  font-size: 11px;
+  fill: #53666c;
+}
+
+.change-row.selected .change-name {
+  font-weight: 700;
+  fill: #1c343d;
+}
+
+.change-bar {
+  fill: #b16b29;
+}
+
+.change-bar.less {
+  fill: #236a66;
+}
+
+.change-row.selected .change-bar {
+  stroke: #172e38;
+  stroke-width: 1.5;
+}
+
+.change-zero {
+  stroke: #1c343d;
+}
+
+.change-direction {
+  font-size: 12px;
+  fill: #53666c;
+}
+
+.era-band {
+  fill: #b16b29;
+  opacity: 0.08;
+}
+
+.era-line {
+  stroke: #b16b29;
+  stroke-width: 2;
+}
+
+.era-label {
+  font-size: 11px;
+  fill: #8a5220;
+}
+
 #detail-note {
   font-size: 14px;
 }
@@ -238,5 +342,9 @@ footer {
   .controls {
     gap: 7px;
     font-size: 12px;
+  }
+  .toggle button {
+    padding: 7px 8px;
+    font-size: 13px;
   }
 }
