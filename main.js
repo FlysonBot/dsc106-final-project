@@ -26,7 +26,9 @@ let timer;
 let view = 'gap'; // 'gap' or 'change'
 
 function formatChange(change) {
-  return (change > 0 ? '+' : '') + change.toFixed(1) + '°C';
+  // Round first so tiny values show as 0.0°C instead of -0.0°C or +0.0°C
+  const rounded = Number(change.toFixed(1)) || 0;
+  return (rounded > 0 ? '+' : '') + rounded.toFixed(1) + '°C';
 }
 
 async function start() {
@@ -339,13 +341,16 @@ async function start() {
     .attr('x', (d) => (x(d.start) + x(d.end)) / 2)
     .attr('text-anchor', 'middle');
 
-  // Average of one measure ('hot', 'cold' or 'gap') over a span of years
+  // Average of one measure ('hot', 'cold', 'gap' or 'change') over a span of years
   function average(state, measure, start, end) {
     let total = 0;
 
     for (let eraYear = start; eraYear <= end; eraYear++) {
       const summary = annual[state][eraYear];
-      total += measure === 'gap' ? summary.gap : summary[measure].temp;
+      total +=
+        measure === 'gap' || measure === 'change'
+          ? summary[measure]
+          : summary[measure].temp;
     }
 
     return total / (end - start + 1);
@@ -491,6 +496,7 @@ async function start() {
   function drawChange() {
     changeBars
       .classed('less', (d) => d[measure] < 0)
+      .classed('gap-measure', measure === 'gap')
       .transition()
       .duration(500)
       .attr('x', (d) => changeX(Math.min(0, d[measure])))
@@ -559,7 +565,7 @@ async function start() {
     document.querySelector('#cold').textContent =
       `${months[value.cold.month - 1]} · ${value.cold.temp.toFixed(1)}°C`;
     document.querySelector('#gap').textContent = value.gap.toFixed(1) + '°C';
-    document.querySelector('#change').textContent = formatChange(value.change);
+    document.querySelector('#gap-change').textContent = formatChange(value.change);
     document.querySelector('#detail-note').textContent =
       `${name} · ${year}. The orange marker shows the selected year.`;
     document
@@ -587,20 +593,22 @@ async function start() {
 
     line.attr('d', drawLine(history));
 
-    // 30-year averages on the line chart, and the matching row in section 03
+    // 30-year averages on the line chart (of the gap or of the change,
+    // matching the map view), and the matching row in section 03
+    const eraAverage = (d) => average(selectedState, view, d.start, d.end);
+
     eraLines
-      .attr('y1', (d) => y(average(selectedState, 'gap', d.start, d.end)))
-      .attr('y2', (d) => y(average(selectedState, 'gap', d.start, d.end)));
+      .attr('y1', (d) => y(eraAverage(d)))
+      .attr('y2', (d) => y(eraAverage(d)));
     eraLabels
       // Label sits at the top or bottom, whichever is away from the line
-      .attr('y', (d) =>
-        average(selectedState, 'gap', d.start, d.end) > upper / 2 ? 256 : 34
-      )
+      .attr('y', (d) => (y(eraAverage(d)) < (20 + 265) / 2 ? 256 : 34))
       .text(
         (d) =>
           `${d.start}–${d.end} avg: ` +
-          average(selectedState, 'gap', d.start, d.end).toFixed(1) +
-          '°C'
+          (view === 'gap'
+            ? eraAverage(d).toFixed(1) + '°C'
+            : formatChange(eraAverage(d)))
       );
     changeRows.classed('selected', (d) => d.state === selectedState);
     cursor.attr('x1', x(year)).attr('x2', x(year));

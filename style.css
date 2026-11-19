@@ -276,6 +276,15 @@ svg {
   fill: #236a66;
 }
 
+/* Gap bars use the same green (wider) and purple (narrower) as the map */
+.change-bar.gap-measure {
+  fill: #427d4c;
+}
+
+.change-bar.gap-measure.less {
+  fill: #9459ae;
+}
+
 .change-row.selected .change-bar {
   stroke: #172e38;
   stroke-width: 1.5;
