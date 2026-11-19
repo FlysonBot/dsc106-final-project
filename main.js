@@ -307,6 +307,218 @@ async function start() {
     .attr('font-size', 12)
     .text('Year');
 
+  // Shaded bands for the two 30-year periods compared in section 03
+  const eras = [
+    { start: 1850, end: 1879 },
+    { start: 1985, end: 2014 }
+  ];
+
+  chart
+    .selectAll('.era-band')
+    .data(eras)
+    .join('rect')
+    .attr('class', 'era-band')
+    .attr('x', (d) => x(d.start))
+    .attr('width', (d) => x(d.end) - x(d.start))
+    .attr('y', 20)
+    .attr('height', 245);
+
+  const eraLines = chart
+    .selectAll('.era-line')
+    .data(eras)
+    .join('line')
+    .attr('class', 'era-line')
+    .attr('x1', (d) => x(d.start))
+    .attr('x2', (d) => x(d.end));
+
+  const eraLabels = chart
+    .selectAll('.era-label')
+    .data(eras)
+    .join('text')
+    .attr('class', 'era-label')
+    .attr('x', (d) => (x(d.start) + x(d.end)) / 2)
+    .attr('text-anchor', 'middle');
+
+  // Average of one measure ('hot', 'cold' or 'gap') over a span of years
+  function average(state, measure, start, end) {
+    let total = 0;
+
+    for (let eraYear = start; eraYear <= end; eraYear++) {
+      const summary = annual[state][eraYear];
+      total += measure === 'gap' ? summary.gap : summary[measure].temp;
+    }
+
+    return total / (end - start + 1);
+  }
+
+  // ---------- Section 03: change between the first and last 30 years ----------
+  const measures = {
+    gap: { more: 'wider', less: 'narrower', label: 'Annual gap' },
+    hot: { more: 'warmer', less: 'cooler', label: 'Hottest month' },
+    cold: { more: 'warmer', less: 'cooler', label: 'Coldest month' }
+  };
+  let measure = 'gap';
+
+  const changes = stateNames.map(function (name) {
+    const state = abbreviations[name];
+    const change = { name: name, state: state };
+
+    for (const key in measures) {
+      change[key] =
+        average(state, key, 1985, 2014) - average(state, key, 1850, 1879);
+    }
+
+    return change;
+  });
+
+  // Rows stay sorted by the change in the gap, whichever measure is shown
+  changes.sort((a, b) => a.gap - b.gap);
+
+  const rowHeight = 15;
+  const changeTop = 34;
+  const changeBottom = changeTop + changes.length * rowHeight;
+  const changeChart = d3
+    .select('#change')
+    .attr('viewBox', `0 0 900 ${changeBottom + 38}`);
+  const changeX = d3.scaleLinear().domain([-4.5, 5.5]).range([150, 880]);
+  const changeY = d3
+    .scaleBand()
+    .domain(changes.map((d) => d.state))
+    .range([changeTop, changeBottom])
+    .padding(0.22);
+
+  changeChart
+    .append('g')
+    .attr('class', 'change-grid')
+    .attr('transform', `translate(0,${changeTop})`)
+    .call(
+      d3
+        .axisTop(changeX)
+        .ticks(10)
+        .tickSize(-(changeBottom - changeTop))
+        .tickFormat((d) => (d > 0 ? '+' : '') + d + '°C')
+    );
+
+  const changeRows = changeChart
+    .selectAll('.change-row')
+    .data(changes)
+    .join('g')
+    .attr('class', 'change-row')
+    .on('click', (event, d) => {
+      selectedState = d.state;
+      menu.value = selectedState;
+      update();
+    })
+    .on('mousemove', (event, d) => {
+      tooltip.hidden = false;
+      tooltip.innerHTML =
+        `<strong>${d.name}</strong><br>1985–2014 compared with 1850–1879` +
+        Object.keys(measures)
+          .map((key) => `<br>${measures[key].label}: ${signed(d[key])}`)
+          .join('');
+      tooltip.style.left =
+        Math.max(
+          8,
+          Math.min(
+            event.clientX + 14,
+            window.innerWidth - tooltip.offsetWidth - 8
+          )
+        ) + 'px';
+      tooltip.style.top =
+        Math.max(
+          8,
+          Math.min(
+            event.clientY + 14,
+            window.innerHeight - tooltip.offsetHeight - 8
+          )
+        ) + 'px';
+    })
+    .on('mouseleave', () => {
+      tooltip.hidden = true;
+    });
+
+  // Invisible full-width rectangle so the whole row reacts to the mouse
+  changeRows
+    .append('rect')
+    .attr('class', 'change-hit')
+    .attr('x', 0)
+    .attr('width', 900)
+    .attr('y', (d) => changeY(d.state) - 1.5)
+    .attr('height', rowHeight);
+
+  changeRows
+    .append('text')
+    .attr('class', 'change-name')
+    .attr('x', 142)
+    .attr('y', (d) => changeY(d.state) + changeY.bandwidth() / 2)
+    .attr('dy', '0.35em')
+    .attr('text-anchor', 'end')
+    .text((d) => d.name);
+
+  const changeBars = changeRows
+    .append('rect')
+    .attr('class', 'change-bar')
+    .attr('y', (d) => changeY(d.state))
+    .attr('height', changeY.bandwidth())
+    .attr('x', changeX(0))
+    .attr('width', 0);
+
+  changeChart
+    .append('line')
+    .attr('class', 'change-zero')
+    .attr('x1', changeX(0))
+    .attr('x2', changeX(0))
+    .attr('y1', changeTop)
+    .attr('y2', changeBottom);
+
+  const lessLabel = changeChart
+    .append('text')
+    .attr('class', 'change-direction')
+    .attr('x', changeX(0) - 10)
+    .attr('y', changeBottom + 24)
+    .attr('text-anchor', 'end');
+
+  const moreLabel = changeChart
+    .append('text')
+    .attr('class', 'change-direction')
+    .attr('x', changeX(0) + 10)
+    .attr('y', changeBottom + 24);
+
+  function signed(value) {
+    return (value > 0 ? '+' : '') + value.toFixed(1) + '°C';
+  }
+
+  function drawChange() {
+    changeBars
+      .classed('less', (d) => d[measure] < 0)
+      .transition()
+      .duration(500)
+      .attr('x', (d) => changeX(Math.min(0, d[measure])))
+      .attr('width', (d) => Math.abs(changeX(d[measure]) - changeX(0)));
+
+    lessLabel.text('← ' + measures[measure].less);
+    moreLabel.text(measures[measure].more + ' →');
+
+    const less = changes.filter((d) => d[measure] < 0).length;
+    document.querySelector('#change-summary').textContent =
+      `${measures[measure].label}: ${measures[measure].more} in ` +
+      `${changes.length - less} states, ${measures[measure].less} in ${less}.`;
+
+    for (const button of document.querySelectorAll('#measure button')) {
+      button.setAttribute('aria-pressed', button.value === measure);
+    }
+  }
+
+  for (const button of document.querySelectorAll('#measure button')) {
+    button.addEventListener('click', () => {
+      measure = button.value;
+      drawChange();
+    });
+    button.disabled = false;
+  }
+
+  drawChange();
+
   const line = chart
     .append('path')
     .attr('fill', 'none')
@@ -374,6 +586,23 @@ async function start() {
       .y((d) => y(d.value));
 
     line.attr('d', drawLine(history));
+
+    // 30-year averages on the line chart, and the matching row in section 03
+    eraLines
+      .attr('y1', (d) => y(average(selectedState, 'gap', d.start, d.end)))
+      .attr('y2', (d) => y(average(selectedState, 'gap', d.start, d.end)));
+    eraLabels
+      // Label sits at the top or bottom, whichever is away from the line
+      .attr('y', (d) =>
+        average(selectedState, 'gap', d.start, d.end) > upper / 2 ? 256 : 34
+      )
+      .text(
+        (d) =>
+          `${d.start}–${d.end} avg: ` +
+          average(selectedState, 'gap', d.start, d.end).toFixed(1) +
+          '°C'
+      );
+    changeRows.classed('selected', (d) => d.state === selectedState);
     cursor.attr('x1', x(year)).attr('x2', x(year));
     dot.attr('cx', x(year)).attr('cy', y(value[view]));
   }
