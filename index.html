@@ -1,87 +1,161 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Is the Gap Between the Hottest and Coldest Months Shrinking?</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <!-- One script per figure -->
-  <script type="module" src="figure1.js"></script>
-</head>
-<body>
-  <header class="hero">
-    <div class="hero-inner">
-      <p class="kicker">DSC 106 Final Project</p>
-      <h1>Is the Gap Between the Hottest and Coldest Months Shrinking Across U.S. States?</h1>
-      <p class="dek" hidden>TODO: one-sentence subtitle</p>
-      <p class="byline">
-        By <span>Flyson Lin</span>, <span>Krishang Khandelwal</span> and <span>Sungsan Rhie</span>
-      </p>
-    </div>
-    <div class="temp-bar" aria-hidden="true"></div>
-  </header>
-
-  <main>
-    <!-- Hook: research question or attention-grabbing statement -->
-    <section id="hook" class="prose" hidden>
-      <p class="lede">TODO: hook</p>
-    </section>
-
-    <!--
-      Figures: each figure has its own section here and its own JS file
-      (figure1.js draws into #figure1). To add a figure, copy this section,
-      change the number, and add a matching <script> tag in <head>.
-    -->
-    <section class="figure">
-      <div class="figure-head">
-        <p class="figure-label">Figure 1</p>
-        <h2>TODO: visualization title</h2>
-      </div>
-      <div id="figure1" class="vis"></div>
-      <p class="caption">TODO: caption</p>
-    </section>
-
-    <!-- Takeaway -->
-    <section id="takeaway" class="prose" hidden>
-      <div class="callout">
-        <p class="callout-label">Takeaway</p>
-        <p>TODO: takeaway</p>
-      </div>
-    </section>
-
-    <!-- Demo video -->
-    <section id="video" class="prose" hidden>
-      <h2>Demo Video</h2>
-      <div class="video-frame">
-        <p>TODO: embed YouTube video</p>
-      </div>
-    </section>
-
-    <!-- Prototype writeup (at least 4 sentences each) -->
-    <section id="writeup" class="notes">
-      <div class="prose">
-        <h2>Prototype Writeup</h2>
-
-        <h3>What have we done so far?</h3>
-        <p>TODO: at least 4 sentences</p>
-
-        <h3>What will be the most challenging part of our project to design, and why?</h3>
-        <p>TODO: at least 4 sentences</p>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="prose">
-      <p>
-        <strong>Data.</strong> CMIP6 CanESM5 historical simulation (r1i1p1f1, Amon/tas), 1850–2014.
-        State averages weight each model grid cell by its overlap with the 2024 U.S. Census Bureau
-        state boundaries (1:500,000).
-      </p>
-    </div>
-  </footer>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The gap between hot and cold months</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="vendor/d3.min.js"></script>
+    <script defer src="vendor/topojson-client.min.js"></script>
+    <script defer src="main.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">DSC 106 · INITIAL PROTOTYPE</p>
+        <h1>Are the hottest and coldest months getting closer together?</h1>
+        <p class="intro">
+          Explore the temperature gap across 50 U.S. states from 1850 to 2014.
+          Does the gap change in the same way everywhere?
+        </p>
+        <p class="definition">
+          <strong>Annual gap</strong> = hottest monthly mean − coldest monthly
+          mean
+        </p>
+        <p class="note">
+          CMIP6 CanESM5 historical simulation · Monthly state averages · Not
+          observed weather or daily temperature extremes
+        </p>
+      </header>
+      <p id="status" role="status">Loading temperature data…</p>
+      <section class="panel" aria-labelledby="map-title">
+        <div class="section-top">
+          <div>
+            <p class="eyebrow">01 / EXPLORE THE STATES</p>
+            <h2 id="map-title">Annual temperature gap</h2>
+          </div>
+          <output id="year-label" for="year">2014</output>
+        </div>
+        <p>
+          Move the slider to change years. Select a state on the map or in the
+          menu to explore its history.
+        </p>
+        <div class="controls">
+          <button id="play" disabled>Play</button><label for="year">Year</label
+          ><span>1850</span
+          ><input
+            id="year"
+            type="range"
+            min="1850"
+            max="2014"
+            value="2014"
+            step="1"
+            disabled
+          /><span>2014</span>
+        </div>
+        <svg
+          id="map"
+          viewBox="0 0 960 600"
+          role="img"
+          aria-label="Map showing the annual temperature gap in each U.S. state"
+        ></svg>
+        <div id="legend" aria-label="Color legend"></div>
+        <p class="note">
+          The color scale stays fixed across all years. Alaska and Hawaii appear
+          as insets. Darker color means a larger gap, not faster warming.
+        </p>
+      </section>
+      <section class="panel" aria-labelledby="detail-title">
+        <p class="eyebrow">02 / FOLLOW ONE STATE</p>
+        <div class="section-top">
+          <h2 id="detail-title">A state's gap over time</h2>
+          <div>
+            <label for="state">State </label
+            ><select id="state" disabled></select>
+          </div>
+        </div>
+        <div class="stats">
+          <div>Hottest month<strong id="hot">—</strong></div>
+          <div>Coldest month<strong id="cold">—</strong></div>
+          <div>Annual gap<strong id="gap">—</strong></div>
+        </div>
+        <p id="detail-note"></p>
+        <svg
+          id="trend"
+          viewBox="0 0 900 320"
+          role="img"
+          aria-label="Selected state's annual temperature gap from 1850 to 2014"
+        ></svg>
+        <p class="note">
+          Each point is one year's gap; the line is not smoothed. Year-to-year
+          variation is not the same as a long-term trend.
+        </p>
+      </section>
+      <section class="text-section">
+        <h2>About the data</h2>
+        <p>
+          This prototype uses the team's shared state_monthly_tas.csv for all 50
+          states. As documented in our proposal, the source is CMIP6 CanESM5,
+          historical experiment, r1i1p1f1, Amon/tas, native grid, version
+          v20190429 (1850–2014). Monthly temperatures were averaged within
+          states using grid-cell overlap with 2024 U.S. Census state boundaries.
+          The model's coarse resolution limits local detail, especially for
+          small and island states.
+        </p>
+        <p>
+          For each state and year, we take the maximum and minimum of twelve
+          monthly mean temperatures and subtract them. The hottest and coldest
+          months can differ across states and years. A smaller gap alone does
+          not tell us whether the hottest month cooled or the coldest month
+          warmed.
+        </p>
+        <p>
+          <a
+            href="https://console.cloud.google.com/storage/browser/cmip6/CMIP6/CMIP/CCCma/CanESM5/historical/r1i1p1f1/Amon/tas/gn/v20190429"
+            >CMIP6 source folder</a
+          >
+          ·
+          <a href="data/state_monthly_tas.csv" download
+            >Download the team's CSV</a
+          >
+          · Map geometry:
+          <a href="https://github.com/topojson/us-atlas">U.S. Atlas</a>
+        </p>
+      </section>
+      <section class="text-section" id="writeup">
+        <h2>Prototype progress</h2>
+        <h3>What have you done so far?</h3>
+        <p>
+          We connected our existing monthly temperature dataset to the webpage
+          and checked that every state-year has twelve months of data. We
+          calculated each annual gap by subtracting the coldest monthly mean
+          temperature from the hottest monthly mean temperature. We built a D3
+          map with a fixed color scale and a year slider that updates the state
+          colors. We added play and pause controls to move through the years.
+          Selecting a state updates a line chart and displays its hottest month,
+          coldest month, and gap for the selected year.
+        </p>
+        <h3>
+          What will be the most challenging part of your project to design, and
+          why?
+        </h3>
+        <p>
+          The most challenging part will be helping readers distinguish
+          long-term changes from year-to-year variation. A changing map can show
+          where gaps are large, but it does not directly show whether those gaps
+          are increasing or decreasing. We plan to compare the first and last
+          thirty years and show changes in the hottest and coldest months
+          separately. This comparison will need clear labels because the size of
+          a gap and the change in a gap are different quantities. We also need
+          to communicate the limits of a single climate model without making the
+          explanation difficult to follow.
+        </p>
+      </section>
+      <footer>
+        Flyson Lin · Krishang Khandelwal · Sungsan Rhie<br />DSC 106 Final
+        Project · Initial Prototype
+      </footer>
+    </main>
+    <div id="tooltip" role="tooltip" hidden></div>
+  </body>
 </html>
