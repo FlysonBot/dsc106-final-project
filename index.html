@@ -88,7 +88,39 @@
         ></svg>
         <p class="note">
           Each point is one year's gap; the line is not smoothed. Year-to-year
-          variation is not the same as a long-term trend.
+          variation is not the same as a long-term trend. The shaded bands
+          mark the first and last 30 years, with the average gap in each.
+        </p>
+      </section>
+      <section class="panel" aria-labelledby="change-title">
+        <p class="eyebrow">03 / COMPARE THEN AND NOW</p>
+        <div class="section-top">
+          <h2 id="change-title">Did the gap shrink?</h2>
+          <div id="measure" class="toggle" role="group" aria-label="Measure">
+            <button value="gap" aria-pressed="true" disabled>Gap</button
+            ><button value="hot" aria-pressed="false" disabled>
+              Hottest month</button
+            ><button value="cold" aria-pressed="false" disabled>
+              Coldest month
+            </button>
+          </div>
+        </div>
+        <p>
+          Each bar is the 1985–2014 average minus the 1850–1879 average for one
+          state. Switch the measure to see whether the hottest or the coldest
+          month moved more. Select a row to follow that state in the charts
+          above.
+        </p>
+        <p id="change-summary" class="summary"></p>
+        <svg
+          id="change"
+          role="img"
+          aria-label="Bar chart of the change in each state between 1850 to 1879 and 1985 to 2014"
+        ></svg>
+        <p class="note">
+          States stay in the same order (by change in the gap) for all three
+          measures. These are averages from one model run, so small differences
+          between states may not be meaningful.
         </p>
       </section>
       <section class="text-section">
@@ -133,7 +165,10 @@
           map with a fixed color scale and a year slider that updates the state
           colors. We added play and pause controls to move through the years.
           Selecting a state updates a line chart and displays its hottest month,
-          coldest month, and gap for the selected year.
+          coldest month, and gap for the selected year. We also added a bar
+          chart that compares each state's 1985–2014 average with its
+          1850–1879 average, with a toggle for the gap, the hottest month, and
+          the coldest month.
         </p>
         <h3>
           What will be the most challenging part of your project to design, and
